@@ -4,8 +4,16 @@ var path = require('path');
 var server = require('http').createServer(app);
 var axios = require('axios');
 var querystring = require('querystring');
-
+var Pusher = require('pusher')
 require('dotenv').config();
+
+var pusher = new Pusher({
+  appId: process.env.PUSHER_AAP_ID,
+  key: process.env.PUSHER_KEY,
+  secret: process.env.PUSHER_SECRET,
+  cluster: process.env.PUSHER_CLUSTER,
+  encrypted: process.env.PUSHER_ENCRYPTED
+})
 
 var bodyParser = require('body-parser');
 app.use( bodyParser.json() );
@@ -30,6 +38,16 @@ app.get('/search/:query', function(req, res) {
     })
   ;
 });
+
+app.post('/cart_update', function(req, res) {
+  pusher.trigger('cart','update', req.body)
+  res.send('')
+})
+
+app.post('/newClient', function(req, res) {
+  pusher.trigger('cart','newClient', req.body)
+  res.send('')
+})
 
 app.use('/node_modules', express.static(path.join(__dirname, 'node_modules')));
 app.use('/public', express.static(path.join(__dirname, 'public')));
